@@ -1,6 +1,7 @@
 package com.logistica.pdv.controller;
 
 import com.logistica.pdv.entity.Seller;
+import com.logistica.pdv.exceptions.NotFoundException;
 import com.logistica.pdv.service.SellerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -18,7 +19,7 @@ public class SellerController {
     @GetMapping()
     public ResponseEntity<List<Seller>> getAllSellers(){
         try {
-            return new ResponseEntity(_sellerService.getAllSellers(), HttpStatus.OK);
+            return new ResponseEntity<>(_sellerService.getAllSellers(), HttpStatus.OK);
         }catch (Exception ex) {
             return new ResponseEntity(ex.getMessage() ,HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -30,19 +31,28 @@ public class SellerController {
             Seller sellerById = _sellerService.getSellerById(id);
 
             if(sellerById != null)
-                return new ResponseEntity(sellerById ,HttpStatus.OK);
+                return new ResponseEntity<>(sellerById ,HttpStatus.OK);
 
-            return new ResponseEntity("Seller Not Found", HttpStatus.NOT_FOUND);
+            throw new IllegalArgumentException("Seller not informed");
 
+        }catch (NotFoundException ex){
+            return new ResponseEntity(ex.getMessage() ,HttpStatus.NOT_FOUND);
+        }catch (IllegalArgumentException ex){
+            return new ResponseEntity(ex.getMessage() ,HttpStatus.BAD_REQUEST);
         }catch (Exception ex) {
             return new ResponseEntity(ex.getMessage() ,HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        } 
     }
 
     @PostMapping()
     public ResponseEntity<Seller> createSeller(@RequestBody Seller seller){
         try {
-            return new ResponseEntity(_sellerService.createSeller(seller), HttpStatus.OK);
+            if(seller != null)
+                return new ResponseEntity<>(_sellerService.createSeller(seller), HttpStatus.OK);
+
+            throw new IllegalArgumentException("Seller not informed");
+        }catch (IllegalArgumentException ex) {
+            return new ResponseEntity(ex.getMessage() ,HttpStatus.BAD_REQUEST);
         }catch (Exception ex) {
             return new ResponseEntity(ex.getMessage() ,HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -51,29 +61,32 @@ public class SellerController {
     @PutMapping()
     public ResponseEntity<Seller> editSeller(@RequestBody Seller seller){
         try {
-            Seller editedSeller = _sellerService.editSeller(seller);
+            if(seller != null)
+                return new ResponseEntity<>(_sellerService.editSeller(seller), HttpStatus.OK);
 
-            if(editedSeller != null)
-                return new ResponseEntity(editedSeller, HttpStatus.OK);
-
-            return new ResponseEntity("Seller not found", HttpStatus.NOT_FOUND);
+            throw new IllegalArgumentException("Seller not informed");
+        }catch (NotFoundException ex){
+            return new ResponseEntity(ex.getMessage() ,HttpStatus.NOT_FOUND);
+        }catch (IllegalArgumentException ex){
+            return new ResponseEntity(ex.getMessage() ,HttpStatus.BAD_REQUEST);
         }catch (Exception ex){
             return new ResponseEntity(ex.getMessage() ,HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    @DeleteMapping()
-    public ResponseEntity deleteSeller(@RequestBody Seller seller){
+    @DeleteMapping("{id}")
+    public ResponseEntity deleteSeller(@PathVariable long id){
         try {
-            Seller deletedSeller = _sellerService.deleteSeller(seller);
+            if(id > 0)
+                return new ResponseEntity<>(_sellerService.deleteSeller(id), HttpStatus.OK);
 
-            if(deletedSeller != null)
-                return new ResponseEntity(deletedSeller , HttpStatus.OK);
-
-            return new ResponseEntity("Seller not found", HttpStatus.NOT_FOUND);
-
+            throw new IllegalArgumentException("Seller not informed");
+        }catch (NotFoundException ex){
+            return new ResponseEntity(ex.getMessage(), HttpStatus.NOT_FOUND);
+        }catch (IllegalArgumentException ex){
+            return new ResponseEntity(ex.getMessage(), HttpStatus.BAD_REQUEST);
         }catch (Exception ex){
-            return new ResponseEntity(ex.getMessage() ,HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 

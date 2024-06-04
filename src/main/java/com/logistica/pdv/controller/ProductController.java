@@ -3,6 +3,7 @@ package com.logistica.pdv.controller;
 import com.logistica.pdv.DTO.NewProductDTO;
 import com.logistica.pdv.entity.Product;
 import com.logistica.pdv.entity.Seller;
+import com.logistica.pdv.exceptions.NotFoundException;
 import com.logistica.pdv.repository.IProductRepository;
 import com.logistica.pdv.repository.ISellerRepository;
 import com.logistica.pdv.service.ProductService;
@@ -35,30 +36,33 @@ public class ProductController {
     @GetMapping("{id}")
     public ResponseEntity findProductById(@PathVariable long id){
         try{
-           var product = _productService.getProductById(id);
+           if (id > 0)
+               return new ResponseEntity<>(_productService.getProductById(id), HttpStatus.OK);
 
-           if (product != null)
-               return new ResponseEntity<>(product, HttpStatus.OK);
-
-            return new ResponseEntity<>("Product not found", HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new IllegalArgumentException("Product not informed");
         }
-        catch (Exception err){
+        catch (IllegalArgumentException err) {
+            return new ResponseEntity<>(err.getMessage(), HttpStatus.BAD_REQUEST);
+        }catch (NotFoundException err) {
+            return new ResponseEntity<>(err.getMessage(), HttpStatus.NOT_FOUND);
+        }catch (Exception err){
             return new ResponseEntity<>(err.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @PostMapping()
     public ResponseEntity createProduct(@RequestBody NewProductDTO productDTO){
-        try{
+        try {
 
-            if(productDTO.getSellerID() != null && productDTO.getSellerID() > 0){
+            if (productDTO != null)
                 return new ResponseEntity<>(_productService.createProduct(productDTO), HttpStatus.OK);
-            }
-            else{
-                throw new Exception("Seller not informed");
-            }
-        }
-        catch (Exception err){
+
+            throw new IllegalArgumentException("Product not informed");
+        }catch (NotFoundException err){
+            return new ResponseEntity<>(err.getMessage(), HttpStatus.NOT_FOUND);
+        }catch (IllegalArgumentException err){
+            return new ResponseEntity<>(err.getMessage(), HttpStatus.BAD_REQUEST);
+        }catch (Exception err){
             return new ResponseEntity<>(err.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -66,13 +70,15 @@ public class ProductController {
     @PutMapping()
     public ResponseEntity editProduct(@RequestBody Product product) {
         try {
-            var editedProduct = _productService.editProduct(product);
+            if(product != null)
+                return new ResponseEntity<>(_productService.editProduct(product), HttpStatus.OK);
 
-            if(editedProduct != null)
-                return new ResponseEntity(editedProduct, HttpStatus.OK);
+            throw new IllegalArgumentException("Product not informed");
 
-            return new ResponseEntity<>("Product not found", HttpStatus.INTERNAL_SERVER_ERROR);
-
+        } catch (IllegalArgumentException err) {
+            return new ResponseEntity<>(err.getMessage(), HttpStatus.BAD_REQUEST);
+        } catch (NotFoundException err) {
+            return new ResponseEntity<>(err.getMessage(), HttpStatus.NOT_FOUND);
         } catch (Exception err) {
             return new ResponseEntity<>(err.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -81,14 +87,16 @@ public class ProductController {
     @DeleteMapping("{id}")
     public ResponseEntity deleteProduct(@PathVariable long id){
         try{
-            var deletedProduct = _productService.deleteProduct(id);
+            if(id > 0)
+                return new ResponseEntity<>(_productService.deleteProduct(id), HttpStatus.OK);
 
-            if(deletedProduct != null)
-              return new ResponseEntity<>(deletedProduct , HttpStatus.OK);
+            throw new IllegalArgumentException("Product not informed");
 
-            return new ResponseEntity<>("Product not found", HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-        catch (Exception err){
+        } catch (NotFoundException err) {
+            return new ResponseEntity<>(err.getMessage(), HttpStatus.NOT_FOUND);
+        } catch (IllegalArgumentException err) {
+            return new ResponseEntity<>(err.getMessage(), HttpStatus.BAD_REQUEST);
+        }catch (Exception err){
             return new ResponseEntity<>(err.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }

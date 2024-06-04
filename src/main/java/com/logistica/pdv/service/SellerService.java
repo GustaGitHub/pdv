@@ -2,13 +2,11 @@ package com.logistica.pdv.service;
 
 import com.logistica.pdv.entity.Product;
 import com.logistica.pdv.entity.Seller;
+import com.logistica.pdv.exceptions.NotFoundException;
 import com.logistica.pdv.repository.IProductRepository;
 import com.logistica.pdv.repository.ISellerRepository;
 import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Example;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,8 +32,8 @@ public class SellerService {
 
         if(sellerOptional.isPresent())
             return sellerOptional.get();
-
-        return null;
+        
+        throw new NotFoundException("Seller not found");
     }
 
     public Seller createSeller(Seller seller){
@@ -48,12 +46,12 @@ public class SellerService {
         if(sellerById.isPresent())
             return _sellerRepository.save(seller);
 
-        return null;
+        throw new NotFoundException("Seller not found");
     }
 
     @Transactional
-    public Seller deleteSeller(Seller seller){
-        Optional<Seller> sellerById = _sellerRepository.findById(seller.getId());
+    public Seller deleteSeller(long id){
+        Optional<Seller> sellerById = _sellerRepository.findById(id);
 
         if(sellerById.isPresent()) {
 
@@ -61,10 +59,10 @@ public class SellerService {
                 _productRepository.deleteById(product.getId());
             }
 
-            _sellerRepository.deleteById(seller.getId());
+            _sellerRepository.deleteById(sellerById.get().getId());
             return sellerById.get();
         }
 
-        return null;
+        throw new NotFoundException("Seller not found");
     }
 }

@@ -3,6 +3,7 @@ package com.logistica.pdv.service;
 import com.logistica.pdv.DTO.NewProductDTO;
 import com.logistica.pdv.entity.Product;
 import com.logistica.pdv.entity.Seller;
+import com.logistica.pdv.exceptions.NotFoundException;
 import com.logistica.pdv.repository.IProductRepository;
 import com.logistica.pdv.repository.ISellerRepository;
 import lombok.NoArgsConstructor;
@@ -34,7 +35,7 @@ public class ProductService {
         if(product.isPresent())
             return product.get();
 
-        return null;
+        throw new NotFoundException("Product not found");
     }
 
     public Product createProduct(NewProductDTO productDTO){
@@ -51,16 +52,19 @@ public class ProductService {
             return _productRepository.save(product);
         }
 
-        return null;
+        throw new NotFoundException("Seller not found");
     }
 
     public Product editProduct(Product product){
         Optional<Product> optionalProduct = _productRepository.findById(product.getId());
 
-        if(optionalProduct.isPresent())
-            return _productRepository.save(optionalProduct.get());
+        if(optionalProduct.isPresent()) {
+            product.setSaleDate(optionalProduct.get().getSaleDate());
+            product.setSeller(optionalProduct.get().getSeller());
+            return _productRepository.save(product);
+        }
 
-        return null;
+        throw new NotFoundException("Product not found");
     }
 
     public Product deleteProduct(long id){
@@ -71,6 +75,6 @@ public class ProductService {
             return product.get();
         }
 
-        return null;
+        throw new NotFoundException("Product not informed");
     }
 }
