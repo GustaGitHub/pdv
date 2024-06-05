@@ -1,5 +1,6 @@
 package com.logistica.pdv.controller;
 
+import com.logistica.pdv.DTO.EditProductDTO;
 import com.logistica.pdv.DTO.NewProductDTO;
 import com.logistica.pdv.entity.Product;
 import com.logistica.pdv.entity.Seller;
@@ -68,7 +69,7 @@ public class ProductController {
     }
 
     @PutMapping()
-    public ResponseEntity editProduct(@RequestBody Product product) {
+    public ResponseEntity editProduct(@RequestBody EditProductDTO product) {
         try {
             if(product != null)
                 return new ResponseEntity<>(_productService.editProduct(product), HttpStatus.OK);

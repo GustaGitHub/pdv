@@ -1,5 +1,7 @@
 package com.logistica.pdv.service;
 
+import com.logistica.pdv.DTO.EditSellerDTO;
+import com.logistica.pdv.DTO.NewSellerDTO;
 import com.logistica.pdv.entity.Product;
 import com.logistica.pdv.entity.Seller;
 import com.logistica.pdv.exceptions.NotFoundException;
@@ -36,15 +38,23 @@ public class SellerService {
         throw new NotFoundException("Seller not found");
     }
 
-    public Seller createSeller(Seller seller){
+    public Seller createSeller(NewSellerDTO sellerDTO){
+        Seller seller = new Seller();
+        seller.setName(sellerDTO.getName());
+
         return _sellerRepository.save(seller);
     }
 
-    public Seller editSeller(Seller seller){
-        Optional<Seller> sellerById = _sellerRepository.findById(seller.getId());
+    public Seller editSeller(EditSellerDTO sellerDTO){
+        Optional<Seller> sellerById = _sellerRepository.findById(sellerDTO.getId());
 
-        if(sellerById.isPresent())
+        if(sellerById.isPresent()) {
+            Seller seller = new Seller();
+            seller.setName(sellerDTO.getName());
+            seller.setId(sellerDTO.getId());
+
             return _sellerRepository.save(seller);
+        }
 
         throw new NotFoundException("Seller not found");
     }

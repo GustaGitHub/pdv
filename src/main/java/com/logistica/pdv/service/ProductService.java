@@ -1,5 +1,6 @@
 package com.logistica.pdv.service;
 
+import com.logistica.pdv.DTO.EditProductDTO;
 import com.logistica.pdv.DTO.NewProductDTO;
 import com.logistica.pdv.entity.Product;
 import com.logistica.pdv.entity.Seller;
@@ -11,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -55,12 +57,26 @@ public class ProductService {
         throw new NotFoundException("Seller not found");
     }
 
-    public Product editProduct(Product product){
-        Optional<Product> optionalProduct = _productRepository.findById(product.getId());
+    @Transactional
+    public Product editProduct(EditProductDTO productDTO){
+        Optional<Product> optionalProduct = _productRepository.findById(productDTO.getId());
 
         if(optionalProduct.isPresent()) {
+            Product product = new Product();
+            String description = productDTO.getDescription() != null ?
+                                                        productDTO.getDescription() :
+                                                        optionalProduct.get().getDescription();
+
+            Seller seller = productDTO.getSellerID() != null ?
+                                                    _sellerRepository.findById(productDTO.getSellerID()).get() :
+                                                    optionalProduct.get().getSeller();
+
+            product.setId(optionalProduct.get().getId());
             product.setSaleDate(optionalProduct.get().getSaleDate());
-            product.setSeller(optionalProduct.get().getSeller());
+            product.setSeller(seller);
+            product.setDescription(description);
+            product.setPrice(productDTO.getPrice());
+
             return _productRepository.save(product);
         }
 

@@ -1,5 +1,7 @@
 package com.logistica.pdv.controller;
 
+import com.logistica.pdv.DTO.EditSellerDTO;
+import com.logistica.pdv.DTO.NewSellerDTO;
 import com.logistica.pdv.entity.Seller;
 import com.logistica.pdv.exceptions.NotFoundException;
 import com.logistica.pdv.service.SellerService;
@@ -45,7 +47,7 @@ public class SellerController {
     }
 
     @PostMapping()
-    public ResponseEntity<Seller> createSeller(@RequestBody Seller seller){
+    public ResponseEntity<Seller> createSeller(@RequestBody NewSellerDTO seller){
         try {
             if(seller != null)
                 return new ResponseEntity<>(_sellerService.createSeller(seller), HttpStatus.OK);
@@ -59,7 +61,7 @@ public class SellerController {
     }
 
     @PutMapping()
-    public ResponseEntity<Seller> editSeller(@RequestBody Seller seller){
+    public ResponseEntity<Seller> editSeller(@RequestBody EditSellerDTO seller){
         try {
             if(seller != null)
                 return new ResponseEntity<>(_sellerService.editSeller(seller), HttpStatus.OK);
