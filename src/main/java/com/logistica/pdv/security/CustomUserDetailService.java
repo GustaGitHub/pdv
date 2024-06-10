@@ -1,5 +1,6 @@
 package com.logistica.pdv.security;
 
+import com.logistica.pdv.DTO.LoginDTO;
 import com.logistica.pdv.entity.User;
 import com.logistica.pdv.repository.IUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,5 +22,17 @@ public class CustomUserDetailService implements UserDetailsService {
             throw new UsernameNotFoundException("User not found");
 
         return new UserPrincipal(user);
+    }
+
+    public void checkCredentialsUser(LoginDTO login) throws Exception{
+        var user = loadUserByUsername(login.getUsername());
+
+        boolean passwordValid = SecurityConfig.passwordEncoder()
+                .matches(login.getPassword(), user.getPassword());
+
+        if(passwordValid == false){
+            throw new Exception("Invalid Password");
+        }
+
     }
 }
