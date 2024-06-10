@@ -29,7 +29,7 @@ public class SecurityConfig{
             )
             .httpBasic(Customizer.withDefaults())
                 .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             );
         return http.build();
     }

@@ -16,11 +16,11 @@ public class UserService {
     private IUserRepository _userRepository;
 
     public User createUser(NewUserDTO newUser){
-        User user = User.builder()
-                            .createdAt(new Timestamp(System.currentTimeMillis()))
-                            .password(SecurityConfig.passwordEncoder().encode(newUser.getPassword()))
-                            .username(newUser.getUsername().trim())
-                            .build();
+        User user = new User();
+
+        user.setCreatedAt(new Timestamp(System.currentTimeMillis()));
+        user.setPassword(SecurityConfig.passwordEncoder().encode(newUser.getPassword()));
+        user.setUsername(newUser.getUsername().trim());
 
         return _userRepository.save(user);
     }
